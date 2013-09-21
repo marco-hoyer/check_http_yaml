@@ -86,6 +86,13 @@ class Test(unittest.TestCase):
     def test_get_url(self):
         self.assertEqual(check_http_yaml.get_url("testhost", 9000, "/icinga-status?query=STATUSFILEAGETT"),"http://testhost:9000/icinga-status?query=STATUSFILEAGETT")
 
+    def test_parse_yaml(self):
+        self.assertEqual(check_http_yaml.parse_yaml("{statusfileage: 100}"), {"statusfileage":100})
+        self.assertEqual(check_http_yaml.parse_yaml("{1: 100}"), {1:100})
+        
+    def test_parse_json(self):
+        self.assertEqual(check_http_yaml.parse_json('["foo", {"bar":["baz", null, 1.0, 2]}]'), [u'foo', {u'bar': [u'baz', None, 1.0, 2]}])
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

@@ -40,7 +40,7 @@ def get_by_http(url):
     try:
         response = requests.get(url)
     except Exception as e:
-        exit_unknown(repr(e))
+        exit_unknown(str(e))
     if (response.status_code == 200):
         return (response.text, response.headers['content-type'])
     else:
@@ -74,11 +74,14 @@ def check_tresholds(warning, critical, inverse):
             exit_unknown("warning must be lower than critical")
 
 def parse_yaml(raw_data):
-    yaml_data = load(raw_data, Loader=Loader)
+    try:
+        yaml_data = load(raw_data, Loader=Loader)
+    except Exception as e:
+        exit_unknown("Error " + str(e))
     return yaml_data
 
 def parse_json(raw_data):
-    json_data = json.load(raw_data)
+    json_data = json.loads(raw_data)
     return json_data
 
 def find_value_for_key(data, key):
@@ -97,16 +100,13 @@ def get_dict_from_response(response):
     else:
         exit_unknown("unknown content type: " + response[1] + " (use json or yaml)")
 
-# main action
 def main(args):
-    url = get_url("localhost",80,"/testsite?query=STATUSFILEAGETT")
+    url = get_url(args.hostname, args.port, args.uri)
     response = get_by_http(url)
     data = get_dict_from_response(response)
-    value = find_value_for_key(data, "STATUSFILEAGETT")
+    value = find_value_for_key(data, args.key)
     check_value("STATUSFILEAGETT",int(value), 5, 8, False)
     
-
-# parameter handling separation
 if __name__ == '__main__':
     # parameter handling
     parser = argparse.ArgumentParser(description='Checks for values in a key-value yaml dict offered by http')
@@ -114,9 +114,9 @@ if __name__ == '__main__':
     parser.add_argument("--warning", help="warning thresholds", type=int)
     parser.add_argument("--critical", help="critical thresholds", type=int)
     parser.add_argument("--inverse", help="invert thresholds", action="store_true")
-    parser.add_argument("--hostname", help="hostname", type=str)
-    parser.add_argument("--port", help="port",type=int)
-    parser.add_argument("--url", help="url for resource to query", type=str)
-    parser.add_argument("--key", help="key to query a value for", type=str)
+    parser.add_argument("hostname", help="hostname", type=str)
+    parser.add_argument("port", help="port",type=int)
+    parser.add_argument("uri", help="uri for resource to query (e.g. /internal)", type=str)
+    parser.add_argument("key", help="key to query a value for", type=str)
     args = parser.parse_args()
     main(args)
