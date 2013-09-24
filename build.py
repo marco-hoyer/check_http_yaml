@@ -25,6 +25,8 @@ def initialize(project):
 
     project.install_file('/usr/lib64/icinga/plugins', 'check_http_yaml.py')
     project.install_file('/etc/icinga/conf.d/commands', 'check_http_yaml.cfg')
+    
+    project.get_property('copy_resources_glob').append('setup.cfg')
 
     project.set_property('distutils_classifiers', [
         'Development Status :: 4 - Beta',
