@@ -22,6 +22,8 @@ default_task = ['publish']
 
 @init
 def initialize(project):
+    
+    project.depends_on("requests")
 
     project.install_file('/usr/lib64/icinga/plugins', 'check_http_yaml.py')
     project.install_file('/etc/icinga/conf.d/commands', 'check_http_yaml.cfg')
