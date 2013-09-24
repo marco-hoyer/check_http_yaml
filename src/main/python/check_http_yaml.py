@@ -64,7 +64,17 @@ def check_value(key, value, warning, critical, inverse):
             exit_critical("value: " + str(value) + " (exceeds critical treshold of " + str(critical) + ")" + get_perfdata(key,value))
         
 def check_tresholds(warning, critical, inverse):
+    
+    if (warning is None) and (critical is None):
+        # no tresholds supplied, skip check
+        return False
+    elif (warning is None) or (critical is None):
+        # only one value supplied
+        exit_unknown("warning and critical must be given")
+    
+    # check values for correctness
     if (warning == critical):
+        # both have same value
         exit_unknown("warning and critical cannot be equal")
     if inverse:
         if (warning <= critical):
@@ -72,6 +82,8 @@ def check_tresholds(warning, critical, inverse):
     else:
         if (warning >= critical):
             exit_unknown("warning must be lower than critical")
+    # everythink ok
+    return True
 
 def parse_yaml(raw_data):
     try:
@@ -105,7 +117,12 @@ def main(args):
     response = get_by_http(url)
     data = get_dict_from_response(response)
     value = find_value_for_key(data, args.key)
-    check_value("STATUSFILEAGETT",int(value), 5, 8, False)
+    if check_tresholds(args.warning, args.critical, args.inverse):
+        # tresholds supplied, check value against them
+        check_value("STATUSFILEAGETT",int(value), args.warning, args.critical, args.inverse)
+    else:
+        # no tresholds supplied, just return the value and perfdata
+        exit_ok("value: " + str(value) + get_perfdata(key,value))
     
 if __name__ == '__main__':
     # parameter handling
