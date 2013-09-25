@@ -124,10 +124,10 @@ def main(args):
     value = find_value_for_key(data, args.key)
     if check_tresholds(args.warning, args.critical, args.inverse):
         # tresholds supplied, check value against them
-        check_value("STATUSFILEAGETT",int(value), args.warning, args.critical, args.inverse)
+        check_value(args.key, int(value), args.warning, args.critical, args.inverse)
     else:
         # no tresholds supplied, just return the value and perfdata
-        exit_ok("value: " + str(value) + get_perfdata(key,value))
+        exit_ok("value: " + str(value) + get_perfdata(args.key, value))
     
 if __name__ == '__main__':
     # parameter handling
