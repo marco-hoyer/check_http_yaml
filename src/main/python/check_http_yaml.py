@@ -29,8 +29,11 @@ def exit_critical(message):
     sys.exit(2)
         
 def exit_unknown(message):
-    print "UNKNOWN - " + message
-    sys.exit(3)
+    if args.unknowniscritical:
+        exit_critical(message)
+    else:
+        print "UNKNOWN - " + message
+        sys.exit(3)
     
 def get_perfdata(key,value):
         return "|" + str(key).lower() + "=" + str(value)
@@ -133,6 +136,7 @@ if __name__ == '__main__':
     parser.add_argument("--warning", help="warning thresholds", type=int)
     parser.add_argument("--critical", help="critical thresholds", type=int)
     parser.add_argument("--inverse", help="invert thresholds", action="store_true")
+    parser.add_argument("--unknowniscritical", help="threat unknown messages as critical", action="store_true")
     parser.add_argument("hostname", help="hostname", type=str)
     parser.add_argument("port", help="port",type=int)
     parser.add_argument("uri", help="uri for resource to query (e.g. /internal)", type=str)
